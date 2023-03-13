@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "pymytools"
+version = "0.0.0"
+description = "Tools used in my pystops project."
+authors = ["Kyoungseoun Chung <kyoungseoun.chung@gmail.com>"]
+readme = "README.md"
+packages = [{ include = "pystops_tool" }]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+h5py = "^3.8.0"
+pyevtk = "^1.5.0"
+rich = "^13.3.2"
+tensorboard = "^2.12.0"
+tqdm = "^4.65.0"
+pandas = "^1.5.3"
+torch = "^1.13.1"
+pymyplot = "^0.2.7"
+vtk = "^9.2.6"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+pytest = "^7.2.2"
+jupyter = "^1.0.0"
+notebook = "^6.5.3"
+pre-commit = "^3.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
