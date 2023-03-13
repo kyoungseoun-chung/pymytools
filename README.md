@@ -3,7 +3,11 @@
 During my PhD, I noticed that some features that I implemented throughout my projects appeared repeatedly.
 As a result, I decided to separate these features and manage them appropriately.
 
-The features include
+## Goal
+
+Manage/unify fragmented features and deploy to `pypi.org`.
+
+## Features
 
 - Diagnostics
   - file I/O
