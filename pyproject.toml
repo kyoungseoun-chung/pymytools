@@ -4,7 +4,7 @@ version = "0.0.1"
 description = "Tools used in my pystops project."
 authors = ["Kyoungseoun Chung <kyoungseoun.chung@gmail.com>"]
 readme = "README.md"
-packages = [{ include = "pystops_tool" }]
+packages = [{ include = "pymytools" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
