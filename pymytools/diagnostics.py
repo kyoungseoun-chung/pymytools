@@ -98,7 +98,8 @@ class DataLoader:
         """
 
         path = Path(file_path)
-        _validate_file(path)
+        if is_file(path) is False:
+            raise FileNotFoundError(f"File {path} does not exist.")
 
         reader = vtkXMLImageDataReader()
         reader.SetFileName(path.as_posix())
@@ -185,7 +186,8 @@ class DataLoader:
         """
         path = Path(file_path)
 
-        _validate_file(path)
+        if is_file(path) is False:
+            raise FileNotFoundError(f"File {path} does not exist.")
 
         reader = vtkXMLUnstructuredGridReader()
         reader.SetFileName(path.as_posix())
@@ -237,7 +239,7 @@ class DataLoader:
             dict[str, Tensor]: Loaded data.
         """
 
-        if _validate_file(path) is False:
+        if is_file(path) is False:
             raise FileNotFoundError(f"File {path} does not exist.")
 
         df = pd.read_csv(path)
@@ -274,7 +276,7 @@ class DataLoader:
             Tensor: Loaded data.
         """
 
-        if _validate_file(path) is False:
+        if is_file(path) is False:
             raise FileNotFoundError(f"File {path} does not exist.")
 
         with h5py.File(path, "r") as f_h5:
@@ -333,7 +335,7 @@ class DataSaver:
 
     def __post_init__(self) -> None:
         # Validate save directory
-        _validate_log_dir(self.save_dir)
+        is_dir(self.save_dir, create=True)
 
     def save_hdf5(
         self, data: dict[str, Tensor] | dict[str, dict[str, Tensor]], file_name: str
@@ -390,7 +392,7 @@ class DataSaver:
         else:
             if itr == 0:
                 # If file already exists, delete it
-                if _validate_file(log_dir):
+                if is_file(log_dir):
                     log_dir.unlink()
 
                 pd_mode = "w"
@@ -570,18 +572,42 @@ class DataSaver:
         )
 
 
-def _validate_log_dir(log_dir: PATHLIKE) -> None:
-    """Check directory and if doesn't exist, create directory."""
+def is_dir(log_dir: PATHLIKE, create: bool = True, verbose: int = 0) -> bool:
+    """Check directory and if doesn't exist, create directory.
+
+    Example:
+        # No `./data` directory exists.
+        >>> is_dir("./data", create=False, verbose=1) # Check if directory exists.
+        >>> is_dir("./data", create=True, verbose=1) # Create directory if it doesn't exist.
+        True
+        >>> is_dir("./data", create=False, verbose=1) # Check if directory exists.
+        True
+
+    Args:
+        log_dir (PATHLIKE): Directory to check.
+        create (bool, optional): Create directory if it doesn't exist. Defaults to True.
+        verbose (int, optional): Verbosity level. Defaults to 0.
+    """
+    from pymytools.logger import logging, markup
 
     log_dir = Path(log_dir).resolve()
 
     if log_dir.exists():
-        return
+        if verbose > 0:
+            logging.info(markup(f"Directory exists at {log_dir}", "green", "bold"))
+        return True
     else:
-        log_dir.mkdir(parents=True)
+        if create:
+            if verbose > 0:
+                logging.info(markup(f"Creating directory: {log_dir}", "yellow", "bold"))
+            log_dir.mkdir(parents=True)
+            return True
+        else:
+            logging.info(markup(f"Directory doesn't exist!", "red", "bold"))
+            return False
 
 
-def _validate_file(file_path: PATHLIKE) -> bool:
+def is_file(file_path: PATHLIKE) -> bool:
     """Check file and if doesn't exist, create file."""
 
     file_path = Path(file_path)
@@ -599,7 +625,7 @@ class DataTracker:
     ):
         self.log_dir = log_dir
 
-        _validate_log_dir(self.log_dir)
+        is_dir(self.log_dir, create=True)
 
         if overwrite:
             pass
