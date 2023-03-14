@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{ include = "pymytools" }]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = ">=3.10,<3.12"
 h5py = "^3.8.0"
 pyevtk = "^1.5.0"
 rich = "^13.3.2"
@@ -17,6 +17,7 @@ pandas = "^1.5.3"
 torch = "^1.13.1"
 pymyplot = "^0.2.7"
 vtk = "^9.2.6"
+scipy = "^1.10.1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
