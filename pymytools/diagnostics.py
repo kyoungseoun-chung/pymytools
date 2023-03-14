@@ -8,6 +8,7 @@ It contains
 
 Note that we assume all data are in the form of `torch.Tensor`.
 """
+import glob
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -24,6 +25,9 @@ from torch.utils.tensorboard.writer import SummaryWriter
 from vtk import vtkXMLUnstructuredGridReader
 from vtk.util.numpy_support import vtk_to_numpy  # type: ignore
 from vtkmodules.vtkIOXML import vtkXMLImageDataReader
+
+from pymytools.logger import logging
+from pymytools.logger import markup
 
 PATHLIKE = str | Path | os.PathLike
 """Path types. Either `str`, `pathlib.Path` or `os.PathLike`"""
@@ -74,6 +78,19 @@ class DataLoader:
 
     dtype: torch.dtype = torch.float64
     device: torch.device = torch.device("cpu")
+
+    def read_state_dict(
+        self, architecture: torch.nn.Module, model_path: PATHLIKE
+    ) -> torch.nn.Module:
+        """Load state dict of the nn architecture."""
+
+        state_dict_loc = Path(model_path).as_posix()
+
+        architecture.load_state_dict(torch.load(state_dict_loc))
+
+        architecture = architecture.to(self.device)
+
+        return architecture
 
     def read_vti(self, file_path: str, key: str | list[str] | None = None) -> VTILoaded:
         """Read VTK image data.
@@ -266,7 +283,7 @@ class DataLoader:
     def read_hdf5(
         self, path: PATHLIKE, key: str | list[str] | None = None
     ) -> dict[str, Tensor]:
-        """Read hdf5 file.
+        """Read hdf5 file. Loaded data will be
 
         Args:
             path (PATHLIKE): Path to load data.
@@ -334,8 +351,32 @@ class DataSaver:
     """Save directory"""
 
     def __post_init__(self) -> None:
-        # Validate save directory
+        # Validate save directory. If not exist, create it.
         is_dir(self.save_dir, create=True)
+
+    def save_model(
+        self, model: torch.nn.Module, model_name: str | None = None, verbose: int = 0
+    ):
+        """Save the trained model state dict.
+
+        Note:
+            - The model is always saved as `model_name.pth` in the save directory.
+
+        Args:
+            model (torch.nn.Module): trained model
+            model_name (str, optional): Model name. Defaults to "".
+            verbose (int, optional): Verbosity level. Defaults to 0.
+        """
+
+        if model_name is None:
+            model_name = "model.pth"
+        else:
+            model_name += ".pth"
+
+        if verbose > 0:
+            logging.info(markup(f"Saving model to {self.save_dir}", "blue", "bold"))
+
+        torch.save(model.state_dict(), Path(self.save_dir, model_name))
 
     def save_hdf5(
         self, data: dict[str, Tensor] | dict[str, dict[str, Tensor]], file_name: str
@@ -673,3 +714,20 @@ def rm_tree(pth: Path):
             rm_tree(child)
     # Remove directory
     pth.rmdir()
+
+
+def file_list_by_pattern(data_dir: PATHLIKE, pattern: str) -> list[str]:
+    """Check directory and return list of all files matching the pattern.
+
+    Example:
+        # In `./data/` directory, there are `data_0000.h5`, `data_0001.h5`, `data_0002.h5`.
+        >>> file_list_by_pattern("./data/", "data_*.h5")
+        ['./data/data_0000.h5', './data/data_0001.h5', './data/data_0002.h5']
+    """
+
+    path = Path(data_dir, pattern).as_posix()
+
+    # else if the directory is given, read all h5 files.
+    file_list = glob.glob(path)
+
+    return file_list

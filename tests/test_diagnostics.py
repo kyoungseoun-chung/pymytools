@@ -10,8 +10,24 @@ from torch.testing import assert_close  # type: ignore
 from pymytools.diagnostics import DataLoader
 from pymytools.diagnostics import DataSaver
 from pymytools.diagnostics import DataTracker
+from pymytools.diagnostics import file_list_by_pattern
 
 SAVE_DIR = "./tests/test_data/"
+
+
+def test_file_list_by_pattern() -> None:
+    f_list = file_list_by_pattern("./tests/test_data/", "test_*.vtu")
+
+    target_list = [
+        "tests/test_data/test_0.vtu",
+        "tests/test_data/test_1.vtu",
+        "tests/test_data/test_2.vtu",
+    ]
+
+    assert len(f_list) == len(target_list)
+
+    for f in f_list:
+        assert f in target_list
 
 
 def test_vti() -> None:
