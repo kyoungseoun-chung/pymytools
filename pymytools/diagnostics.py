@@ -87,9 +87,9 @@ class DataLoader:
 
         state_dict_loc = Path(model_path).as_posix()
 
-        architecture.load_state_dict(torch.load(state_dict_loc))
-
-        architecture = architecture.to(self.device)
+        architecture.load_state_dict(
+            torch.load(state_dict_loc, map_location=self.device)
+        )
 
         return architecture
 
