@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Test diagnostics"""
-from enum import Enum, auto
 import random
+from enum import auto
+from enum import Enum
 from pathlib import Path
 
 import torch

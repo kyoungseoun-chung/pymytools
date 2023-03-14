@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pymytools"
-version = "0.1.2"
+version = "0.1.4"
 description = "Tools used in my pystops project."
 authors = ["Kyoungseoun Chung <kyoungseoun.chung@gmail.com>"]
 readme = "README.md"

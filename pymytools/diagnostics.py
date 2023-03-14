@@ -8,10 +8,10 @@ It contains
 
 Note that we assume all data are in the form of `torch.Tensor`.
 """
-from enum import Enum
 import glob
 import os
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 from typing import TypedDict
 
