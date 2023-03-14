@@ -325,8 +325,12 @@ class DataLoader:
             data_hdf5: dict[str, Tensor] = {}
 
             for k in key_to_get:
+                data = f_h5[k]
+
+                assert isinstance(data, h5py.Dataset)
+
                 data_hdf5[k.rsplit("/", 1)[-1]] = torch.tensor(
-                    f_h5[k], dtype=self.dtype, device=self.device
+                    data[:], dtype=self.dtype, device=self.device
                 )
 
             return data_hdf5
