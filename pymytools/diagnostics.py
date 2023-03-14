@@ -8,6 +8,7 @@ It contains
 
 Note that we assume all data are in the form of `torch.Tensor`.
 """
+from enum import Enum
 import glob
 import os
 from dataclasses import dataclass
@@ -659,11 +660,9 @@ def is_file(file_path: PATHLIKE) -> bool:
 class DataTracker:
     """Track simulation data using tensorboard."""
 
-    def __init__(
-        self,
-        log_dir: PATHLIKE,
-        overwrite: bool = True,
-    ):
+    stage: Enum | None
+
+    def __init__(self, log_dir: PATHLIKE, overwrite: bool = True):
         self.log_dir = log_dir
 
         is_dir(self.log_dir, create=True)
@@ -675,8 +674,38 @@ class DataTracker:
 
         self._writer = SummaryWriter(log_dir)
 
+    def set_stage(self, stage: Enum):
+        """Set stage (Enum class)."""
+
+        self.stage = stage
+
+    def add_batch_metric(self, name: str, value: float, step: int) -> None:
+        """Add batch metric to tensorboard."""
+
+        if self.stage is None:
+            msg = f"batch/{name}"
+        else:
+            msg = f"{self.stage.name}/batch/{name}"
+
+        self._writer.add_scalar(msg, value, step)
+
+    def add_epoch_metric(self, name: str, value: float, step: int) -> None:
+        """Add epoch metric to tensorboard."""
+
+        if self.stage is None:
+            msg = f"epoch/{name}"
+        else:
+            msg = f"{self.stage.name}/epoch/{name}"
+
+        self._writer.add_scalar(msg, value, step)
+
     def add_scalar(self, msg: str, value: float, step: int) -> None:
         """Add scalar metric to tensorboard."""
+
+        if self.stage is None:
+            msg = msg
+        else:
+            msg = f"{self.stage.name}/{msg}"
 
         self._writer.add_scalar(msg, value, step)
 

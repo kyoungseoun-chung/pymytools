@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Test diagnostics"""
+from enum import Enum, auto
 import random
 from pathlib import Path
 
@@ -146,11 +147,17 @@ def test_tensorboard() -> None:
 
     x = torch.linspace(0, 1, 8)
 
+    class Stage(Enum):
+        TEST = auto()
+
+    tracker.set_stage(Stage.TEST)
     for i in range(10):
         tracker.add_scalar("single", i * random.random(), i)
         tracker.add_scalars(
             "multi", {"a": i * random.random(), "b": i * random.random()}, i
         )
+        tracker.add_epoch_metric("rand", i * random.random(), i)
+        tracker.add_batch_metric("rand", i * random.random(), i)
 
         y = x**2 * torch.rand(x.shape)
         fig, ax = plt.subplots()
