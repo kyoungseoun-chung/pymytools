@@ -115,7 +115,7 @@ def test_csv() -> None:
         ds.save_csv({"x": i * 2, "itr": i}, "test_2.csv", i)
 
     res = dl.read_csv(SAVE_DIR + "test_2.csv")
-    target = torch.tensor(torch.arange(0, 8, 1), dtype=torch.float32)
+    target = torch.tensor([0, 1, 2, 3, 4, 5, 6, 7], dtype=torch.float32)
     assert_close(res["x"], target * 2)
     assert_close(res["itr"], target)
 
