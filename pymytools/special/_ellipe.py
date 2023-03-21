@@ -10,7 +10,7 @@ import torch
 from scipy.special import ellipe as s_ellipe
 from torch import Tensor
 
-from pymytools.special import ellipk
+from pymytools.special._ellipk import ellipk
 
 
 def poly_p1(x: Tensor):
