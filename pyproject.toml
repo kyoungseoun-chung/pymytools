@@ -14,10 +14,10 @@ rich = "^13.3.2"
 tensorboard = "^2.12.0"
 tqdm = "^4.65.0"
 pandas = "^1.5.3"
-torch = "^1.13.1"
 pymyplot = "^0.2.7"
 vtk = "^9.2.6"
 scipy = "^1.10.1"
+torch = "^2.0.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
