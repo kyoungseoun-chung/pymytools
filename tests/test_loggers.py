@@ -6,7 +6,22 @@ import pytest
 
 from pymytools.logger import draw_rule
 from pymytools.logger import markup
+from pymytools.logger import Report
 from pymytools.logger import timer
+
+
+def test_rich_table() -> None:
+    content = {
+        "name of test": ["test1", "test2"],
+        "value": [1, 2],
+        "anything else": [0.1, 0.2],
+    }
+
+    report = Report(
+        "test", content, ["left", "center", "right"], ["green", "red", "blue"]
+    )
+
+    report.display()
 
 
 def test_rich_markup() -> None:

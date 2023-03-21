@@ -1,16 +1,19 @@
 #!/usr/bin/env python3
 """Test special functions."""
-
 import time
-from scipy.special import ellipe, ellipk
-from pymytools.specials import t_ellipe, t_ellipk
+
 import torch
+from scipy.special import ellipe
+from scipy.special import ellipk
 from torch.testing import assert_close  # type: ignore
-from pymytools.logger import Table, console
+
+from pymytools.logger import console
+from pymytools.logger import Table
+from pymytools.specials import t_ellipe
+from pymytools.specials import t_ellipk
 
 
 def test_elliptic_integral() -> None:
-
     n_test = 1000000
 
     device = torch.device("cpu")
@@ -41,7 +44,6 @@ def test_elliptic_integral() -> None:
     assert_close(s_test, t_test)
 
     if torch.backends.mps.is_available():  # type: ignore
-
         device = torch.device("mps")
         dtype = torch.float32
 
@@ -55,7 +57,6 @@ def test_elliptic_integral() -> None:
         )
 
     elif torch.cuda.is_available():
-
         device = torch.device("cuda")
         dtype = torch.float64
 

@@ -3,7 +3,10 @@
 import logging
 
 from rich.console import Console
+from rich.console import JustifyMethod
+from rich.console import RenderableType
 from rich.logging import RichHandler
+from rich.style import StyleType
 from rich.table import Table
 
 console = Console()
@@ -19,6 +22,52 @@ logging.basicConfig(
 )
 
 log = logging.getLogger("rich")
+
+
+@dataclass
+class Report:
+    """Report the dictionary type data using the rich table."""
+
+    title: str
+    content: dict[str, list[RenderableType]]
+    justify: JustifyMethod | list[JustifyMethod] | None = "center"
+    style: StyleType | list[StyleType] | None = "cyan"
+
+    def __post_init__(self):
+        self.table = Table(title=self.title)
+
+    def display(self) -> None:
+        """Print out the rich table."""
+
+        # Construct header
+        for idx, (k, _) in enumerate(self.content.items()):
+            if isinstance(self.justify, list):
+                justify = self.justify[idx]
+            elif self.justify is None:
+                justify = "center"
+            else:
+                justify = self.justify
+
+            if isinstance(self.style, list):
+                style = self.style[idx]
+            elif self.justify is None:
+                style = "cyan"
+            else:
+                style = self.style
+
+            self.table.add_column(k, justify=justify, style=style)
+
+        render: list[list[str]] = []
+
+        for _, values in self.content.items():
+            # Rich only accept string as a renderable object
+            render.append([str(v) for v in values])
+
+        renderables = [list(i) for i in zip(*render)]
+        for r in renderables:
+            self.table.add_row(*r)
+
+        console.print(self.table)
 
 
 @dataclass

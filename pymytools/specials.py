@@ -10,7 +10,7 @@ Note:
     - Performance is just comparable to direct `scipy` function call with `cpu`. But using `gpu` backend is slightly worse.
         - I guess this is due to the copy of memory while it converts `gpu` tensor to `cpu` tensor.
         - Also, the actual computation is in `cpu` so it is expected.
-        - Elliptic integral Performance, n=1000000             
+        - Elliptic integral Performance, n=1000000
             ┏━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
             ┃     Name     ┃ Elapsed time [s] ┃
             ┡━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━┩
@@ -21,8 +21,8 @@ Note:
             │ torch (gpu)  │     0.01007      │
             └──────────────┴──────────────────┘
 """
-
-from scipy.special import ellipk, ellipe
+from scipy.special import ellipe
+from scipy.special import ellipk
 from torch import Tensor
 
 
