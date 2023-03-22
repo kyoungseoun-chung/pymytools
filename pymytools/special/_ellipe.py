@@ -893,9 +893,9 @@ def ellipe(m: Tensor) -> Tensor:
 
     x = torch.where(m < 0.0, m / (m - 1.0), x)
 
-    x = torch.where(x == 0.0, torch.pi / 2.0, x)
-    x = torch.where(x == 1.0, 1.0, x)
-    x = torch.where(x > 1.0, torch.nan, x)
+    x = torch.where(m / (m - 1.0) == 0.0, torch.pi / 2.0, x)
+    x = torch.where(m / (m - 1.0) == 1.0, 1.0, x)
+    x = torch.where(m / (m - 1.0) > 1.0, torch.nan, x)
 
     x = torch.where((x > 0.0) & (x < 0.1), poly_p1(x - 0.05), x)
     x = torch.where((x >= 0.1) & (x < 0.2), poly_p2(x - 0.15), x)

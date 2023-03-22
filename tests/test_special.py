@@ -26,6 +26,7 @@ def test_elliptic_vmap() -> None:
     vmap_ellipe = vmap(t_ellipe_new)
 
     test_k = torch.arange(-2, 0.9, 2.9 / n_test, dtype=torch.float32, device=device)
+    test_k[-1] = 0.0
 
     tic = time.perf_counter()
     ek_scipy = t_ellipk(test_k)
@@ -38,6 +39,7 @@ def test_elliptic_vmap() -> None:
     assert_close(ek_scipy, ek_n)
 
     test_e = torch.arange(-1, 1, 2.0 / n_test, dtype=torch.float32, device=device)
+    test_e[-1] = 0.0
 
     tic = time.perf_counter()
     ee_scipy = t_ellipe(test_e)
@@ -65,6 +67,7 @@ def test_new_elliptic() -> None:
     test_k = torch.arange(-2, 0.95, 2.95 / n_test, device=torch.device("cpu")).to(
         device=device
     )
+    test_k[-1] = 0.0
 
     tic = time.perf_counter()
     s_test = t_ellipk(test_k)
