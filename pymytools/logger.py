@@ -23,6 +23,25 @@ logging.basicConfig(
 
 log = logging.getLogger("rich")
 
+SUPPORTING_COLORS: list[str] = [
+    "black",
+    "red",
+    "green",
+    "yellow",
+    "blue",
+    "magenta",
+    "cyan",
+    "white",
+    "bright_black",
+    "bright_red",
+    "bright_green",
+    "bright_yellow",
+    "bright_blue",
+    "bright_magenta",
+    "bright_cyan",
+    "bright_white",
+]
+
 
 @dataclass
 class Report:
@@ -142,36 +161,19 @@ def markup(msg: str, color: str | None = None, style: str | None = None) -> str:
     if style is None:
         tag += ""
     else:
-        assert style in ["bold", "italic", "underline", "strike"] or style in [
+        assert style in ["bold", "italic", "underline", "strike", "blink"] or style in [
             "b",
             "i",
             "u",
             "s",
+            "bk",
         ]
         tag += style
 
     if color is None:
         tag += ""
     else:
-        assert color in [
-            "black",
-            "red",
-            "green",
-            "yellow",
-            "blue",
-            "magenta",
-            "cyan",
-            "white",
-            "bright_black",
-            "bright_red",
-            "bright_green",
-            "bright_yellow",
-            "bright_blue",
-            "bright_magenta",
-            "bright_cyan",
-            "bright_white",
-        ]
-
+        assert color in SUPPORTING_COLORS
         if len(tag) > 1:
             tag += " " + color
         else:

@@ -18,6 +18,7 @@ pymyplot = "^0.2.7"
 vtk = "^9.2.6"
 scipy = "^1.10.1"
 torch = "^2.0.0"
+simpleaudio = "^1.0.4"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
