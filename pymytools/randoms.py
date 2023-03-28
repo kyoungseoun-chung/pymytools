@@ -13,9 +13,12 @@ from pymytools.constants import PI
 
 
 @dataclass
-class RandomNumbers:
+class Randoms:
     """Class for random number generators. Created as separate class to set
     fixed random number seed but not working as I intended yet.
+
+    Note:
+        - Suffix with `_v` means vector form, `_t` means tensor form.
     """
 
     dtype: torch.dtype = torch.float64
@@ -40,8 +43,32 @@ class RandomNumbers:
         """
         return torch.rand(dtype=self.dtype, device=self.device).item()
 
-    def uniform_nd(self, n_row: int, n_col: int) -> Tensor:
-        """rand_uniform_array generates an array of random numbers.
+    def normal(self) -> float:
+        """Normal random number."""
+        return torch.randn(dtype=self.dtype, device=self.device).item()
+
+    def normal_v(self, n: int) -> Tensor:
+        """Normal random numbers in vector form."""
+        return torch.randn(n, dtype=self.dtype, device=self.device)
+
+    def normal_t(self, n_row: int, n_col: int) -> Tensor:
+        """Normal random number tensor.
+
+        Args:
+            n_row (int): number of rows of output
+            n_col (int): number of columns of output
+
+        Returns:
+            Tensor
+        """
+        return torch.randn((n_row, n_col), dtype=self.dtype, device=self.device)
+
+    def uniform_v(self, n: int) -> Tensor:
+        """Uniform random numbers in vector form."""
+        return torch.rand(n, dtype=self.dtype, device=self.device)
+
+    def uniform_t(self, n_row: int, n_col: int) -> Tensor:
+        """Uniform random number tensor.
 
         Args:
             n_row (int): number of rows of output
@@ -52,7 +79,7 @@ class RandomNumbers:
         """
         return torch.rand((n_row, n_col), dtype=self.dtype, device=self.device)
 
-    def bi_normal(self, mean: list, std: list, n: int) -> Tensor:
+    def bi_normal_v(self, mean: list, std: list, n: int) -> Tensor:
         """random bi-modal normal distribution
 
         Note:
@@ -61,7 +88,7 @@ class RandomNumbers:
             is scaled to have zero mean and unity standard deviation
         """
 
-        rnd_bi_norm = self.skew_normal_nd([0, 0], mean, std, n, 2)
+        rnd_bi_norm = self.skew_normal_t([0, 0], mean, std, n, 2)
 
         rnd = rnd_bi_norm.sum(dim=1)
         rnd -= rnd.mean()
@@ -69,7 +96,7 @@ class RandomNumbers:
 
         return rnd
 
-    def skew_normal_nd(
+    def skew_normal_t(
         self, alpha: list, mean: list, std: list, n: int, m: int
     ) -> Tensor:
         """3d skewed normal distribution
@@ -92,11 +119,11 @@ class RandomNumbers:
         rnd = torch.zeros((n, m), dtype=self.dtype, device=self.device)
 
         for i in range(m):
-            rnd[:, i] = self.skew_normal(alpha[i], mean[i], std[i], n)
+            rnd[:, i] = self.skew_normal_v(alpha[i], mean[i], std[i], n)
 
         return rnd
 
-    def skew_normal(
+    def skew_normal_v(
         self, alpha: float, mean: float, std: float, n_samples: int
     ) -> Tensor:
         """rand_skew_normal creates numpy array filled with
@@ -123,7 +150,9 @@ class RandomNumbers:
             dtype=self.dtype, device=self.device
         )
 
-    def maxwell(self, n_pt: int, loc=0, beta=1.0 / sqrt(2.0)) -> Tensor:
+    def maxwell_v(
+        self, n_pt: int, loc: float = 0.0, beta: float = 1.0 / sqrt(2.0)
+    ) -> Tensor:
         """Rnadom Maxwell distribution."""
         return (
             torch.sqrt(
@@ -133,8 +162,12 @@ class RandomNumbers:
             + loc
         )
 
-    def from_pdf_1d(
-        self, pdf: Tensor, bounds: list[float] | tuple[float, float], n_pt: int
+    def from_maxed_v(
+        self,
+        coeffs: Tensor,
+        pdf: Tensor,
+        bounds: list[float] | tuple[float, float],
+        n_pt: int,
     ) -> Tensor:
         """Sample n_pt number of random varables according to the Maximum
         Entropy Distribution (MED) by the given coefficients.
@@ -153,11 +186,11 @@ class RandomNumbers:
         w_bounds = bounds[1] - bounds[0]
         h_bounds = bounds[1]
 
-        rnd_sample = _rejection_sampling(w_bounds, h_bounds, pdf, n_pt)
+        rnd_sample = _rejection_sampling(w_bounds, h_bounds, coeffs, pdf, n_pt)
 
         return rnd_sample
 
-    def cylinder(
+    def cylinder_t(
         self,
         n_pt: int,
         bounds: list[list[float]] | tuple[tuple[float, float], ...] = ((0, 5), (-5, 5)),
@@ -197,7 +230,7 @@ class RandomNumbers:
 
 
 def _rejection_sampling(
-    w_bounds: float, h_bounds: float, pdf: Tensor, n_pt: int
+    w_bounds: float, h_bounds: float, coeffs: Tensor, pdf: Tensor, n_pt: int
 ) -> Tensor:
     """Sample random number from the pdf using the acceptance-rejection method."""
     rnd_sample = torch.zeros(n_pt)
@@ -207,7 +240,11 @@ def _rejection_sampling(
         loc = w_bounds * torch.rand() - h_bounds
         decide = pdf.max() * torch.rand()
 
-        if decide < pdf:
+        maxed = torch.exp(
+            torch.sum(coeffs * torch.pow(loc, torch.arange(coeffs.shape[0])))
+        )
+
+        if decide < maxed:
             rnd_sample[i_sample] = loc
             i_sample += 1
 
