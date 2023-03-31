@@ -105,6 +105,9 @@ class Timer:
 
     clock: dict[str, dict[str, float]] = field(default_factory=dict)
 
+    def reset(self) -> None:
+        self.clock = {}
+
     def start(self, name: str) -> None:
         """Start timer with name"""
 

@@ -58,6 +58,16 @@ def test_timer_class() -> None:
 
     assert timer.elapsed("other") == pytest.approx(0.5, 0.1)
 
+    # With reset
+    timer.reset()
+    timer.start("test")
+    for _ in range(5):
+        time.sleep(0.1)
+
+    timer.end("test")
+
+    assert timer.elapsed("test") == pytest.approx(0.5, 0.5)
+
     timer.display()
 
 
